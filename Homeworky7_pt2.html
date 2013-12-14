@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang = "en">
+	<head>
+		<title>Why aren't you working</title>
+		<meta charset="utf-8">
+		<style>
+			body{
+				margin: 0px;
+				background-color: #FFFFFF;
+				overflow: hidden;
+			}
+			
+			#lima{
+				position: absolute;
+				top: 500px, right: 500px;
+				width: 100%;
+				height: 10%;
+				padding: -10%;
+				color: #000000;
+				background: #FFFFFF;
+				z-index:1000;
+		</style>
+		<div id="lima">
+			<p>This diagram is meant to represent the processies that occur in the cyberinfrastructure final project.
+			The box to the furthest right is mean to represent the home pc from which the user would begin inputing instructions.
+			The green dots represent commands being sent between nodes. Orange represents unprocessed data.  Purple is processed data.
+			The speed relates to the how fast the data packet can travel across the network.  The size of the orbs represents the relative
+			size of the data packet as it relates.</p>
+		</div>
+	</head>
+	<body>
+		<script src = "build/three.min.js"></script>
+		<script src="examples/js/controls/TrackballControls.js"></script>
+		
+		<script>
+			var camera, scene, renderer;
+			var lima, hpc, homepc, iPlant, delta;
+			var light1, light2;
+			//transfer boolean
+			var t_homepc_hpc = false, t_homepc_delta = false, t_homepc_lima = false, t_homepc_iplant = false;
+			var t_hpc_homepc = false, t_hpc_delta = false, t_hpc_lima = false, t_hpc_iplant = false;
+			var t_delta_homepc = false, t_delta_hpc = false, t_delta_lima = false, t_delta_iplant = false;
+			var t_lima_homepc = false, t_lima_hpc = false, t_lima_delta = false, t_lima_iplant = false;
+ 			var t_iplant_homepc = false, t_implant_hpc = false, t_iplant_delta = false, t_iplant_lima = false;
+ 			var t_delta_iplant_data = false, t_lima_iplant_data = false;
+ 			
+ 			var total = 10;
+ 			
+ 			var mouseX = 0, mouseY = 0;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight /2;
+ 			
+			
+			init();
+			animate();
+			
+			function init() {
+			
+
+				
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000);
+				camera.position.z = 600;
+				controls = new THREE.TrackballControls(camera);
+				controls.target.z = 0;
+				
+				scene = new THREE.Scene();
+				
+				var geo1 = new THREE.CubeGeometry(100,100,100);
+				var light = new THREE.AmbientLight( 0x404040 ); // soft white light scene.add( light );	
+				scene.add(light)
+								
+				var lima_material = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
+				var hpc_material = new THREE.MeshPhongMaterial({color: 0x808080});
+				var homepc_material = new THREE.MeshPhongMaterial({color: 0xF0F0F0});
+				var iPlant_material = new THREE.MeshPhongMaterial({color: 0xA0A0A0});
+				var delta_material = new THREE.MeshPhongMaterial({color: 0x404040});
+				
+// 				var text1 = new THREE.TextGeometry('Home PC');
+// 				text1.computeBoundingBox();
+// 				text1.computeVertexNormals();
+// 				var text1Material = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
+// 				var text_Home = new THREE.Mesh(text1, text1Material);
+// 				text_Home.position.x = 500;
+// 				text_Home.position.y = 50;
+// 				text_Home.position.z = -500;
+// 				scene.add(text_home);				
+				//lima.futuregrid.org 400mi
+				lima = new THREE.Mesh(geo1 , lima_material);
+				lima.position.x = 300;
+				lima.position.y = 500;
+				lima.position.z = -500;
+				scene.add(lima);
+				//UA.HPC  1mi
+ 				hpc = new THREE.Mesh(geo1, hpc_material);
+ 				hpc.position.x = -50;
+ 				hpc.position.y = 0;
+ 				hpc.position.z = -500;
+ 				scene.add(hpc);
+ 				//Home computer 0
+ 				homepc = new THREE.Mesh(geo1, homepc_material);
+ 				homepc.position.x = 700;
+ 				homepc.position.y = 0;
+ 				homepc.position.z = -500;
+				scene.add(homepc);
+ 				//iPlant collaborative (for storage) 1mi
+ 				iPlant = new THREE.Mesh(geo1, iPlant_material);
+ 				iPlant.position.x = -700;
+ 				iPlant.position.y = 0;
+ 				iPlant.position.z = -500;
+ 				scene.add(iPlant);
+ 				//Delta.futuregrid.org  1667mi from tucons
+ 				delta = new THREE.Mesh(geo1, delta_material);
+ 				delta.position.x = 300;
+				delta.position.y = -500;
+				delta.position.z = -500;
+ 				scene.add(delta);
+ 				light1 = new THREE.PointLight(0x00FF00, 3, 500);
+				light1.position.x = 700;
+				light1.position.y = 0;
+				light1.position.z = -500;
+				scene.add(light1);
+				var circ1 = new THREE.SphereGeometry(5,5,5);
+				var circ1_matter = new THREE.MeshBasicMaterial({color: 0x00FF00});
+				var circ2 = new THREE.SphereGeometry(10,10,10);
+				var circ2_matter = new THREE.MeshBasicMaterial({color: 0xFFFF00})
+				var circ3 = new THREE.SphereGeometry(20,20,20);
+				var circ3_matter = new THREE.MeshBasicMaterial({color: 0xFF00FF});
+				var l1 = new THREE.Mesh(circ1, circ1_matter);
+				l1.position = light1.position;
+				scene.add(l1);
+				
+				light2 = new THREE.PointLight(0xFFFF00, 10, 500);
+				light2.position.x = -50;
+				light2.position.y = 0;
+				light2.position.z = -500;
+				scene.add(light2);
+				var l2 = new THREE.Mesh(circ2, circ2_matter);
+				l2.position = light2.position;
+				scene.add(l2);
+				
+				light3 = new THREE.PointLight(0x00FF00, 10, 500);
+				light3.position.x = 700;
+				light3.position.y = 0;
+				light3.position.z = -500;
+				scene.add(light3);
+				var l3 = new THREE.Mesh(circ1, circ1_matter);
+				l3.position = light3.position;
+				scene.add(l3);
+				
+				light4 = new THREE.PointLight(0x00FF00, 10, 500);
+				light4.position.x = 700;
+				light4.position.y = 0;
+				light4.position.z = -500;
+				scene.add(light4);
+				var l4 = new THREE.Mesh(circ1, circ1_matter);
+				l4.position = light4.position;
+				scene.add(l4);
+				
+				light5 = new THREE.PointLight(0x00FF00, 10, 500);
+				light5.position.x = 300;
+				light5.position.y = 500;
+				light5.position.z = -500;
+				scene.add(light5);
+				var l5 = new THREE.Mesh(circ1, circ1_matter);
+				l5.position = light5.position;
+				scene.add(l5);
+				
+				light6 = new THREE.PointLight(0x00FF00, 10, 500);
+				light6.position.x = 300;
+				light6.position.y = -500;
+				light6.position.z = -500;
+				scene.add(light6);
+				var l6 = new THREE.Mesh(circ1, circ1_matter);
+				l6.position = light6.position;
+				scene.add(l6);
+				
+				light7 = new THREE.PointLight(0x00FF00, 10, 500);
+				light7.position.x = 300;
+				light7.position.y = 500;
+				light7.position.z = -500;
+				scene.add(light7);
+				var l7 = new THREE.Mesh(circ1, circ1_matter);
+				l7.position = light7.position;
+				scene.add(l7);
+				
+				light8 = new THREE.PointLight(0x00FF00, 10, 500);
+				light8.position.x = 300;
+				light8.position.y = -500;
+				light8.position.z = -500;
+				scene.add(light8);
+				var l8 = new THREE.Mesh(circ1, circ1_matter);
+				l8.position = light8.position;
+				scene.add(l8);
+				
+				light9 = new THREE.PointLight(0x00FF00, 10, 500);
+				light9.position.x = -50;
+				light9.position.y = 0;
+				light9.position.z = -500;
+				scene.add(light9);
+				var l9 = new THREE.Mesh(circ1, circ1_matter);
+				l9.position = light9.position;
+				scene.add(l9);
+				
+				light10 = new THREE.PointLight(0x00FF00, 10, 500);
+				light10.position.x = -50;
+				light10.position.y = 0;
+				light10.position.z = -500;
+				scene.add(light10);
+				var l10 = new THREE.Mesh(circ1, circ1_matter);
+				l10.position = light10.position;
+				scene.add(l10);
+				
+				light11 = new THREE.PointLight(0xFFFF00, 10, 500);
+				light11.position.x = -700;
+				light11.position.y = 0;
+				light11.position.z = -500;
+				scene.add(light11);
+				var l11 = new THREE.Mesh(circ2, circ2_matter);
+				l11.position = light11.position;
+				scene.add(l11);
+				
+				light12 = new THREE.PointLight(0xFFFF00, 10, 500);
+				light12.position.x = -700;
+				light12.position.y = 0;
+				light12.position.z = -500;
+				scene.add(light12);
+				var l12 = new THREE.Mesh(circ2, circ2_matter);
+				l12.position = light12.position;
+				scene.add(l12);
+				
+				light13 = new THREE.PointLight(0xFF00FF, 10, 500);
+				light13.position.x = 300;
+				light13.position.y = 500;
+				light13.position.z = -500;
+				scene.add(light13);
+				var l13 = new THREE.Mesh(circ3, circ3_matter);
+				l13.position = light13.position;
+				scene.add(l13);
+				
+				light14 = new THREE.PointLight(0xFF00FF, 10, 500);
+				light14.position.x = 300;
+				light14.position.y = -500;
+				light14.position.z = -500;
+				scene.add(light14);
+				var l14 = new THREE.Mesh(circ3, circ3_matter);
+				l14.position = light14.position;
+				scene.add(l14);
+				
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight);
+				document.body.appendChild( renderer.domElement);
+				
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false);
+				
+			}
+			
+			
+			
+			
+			var t = 0;
+			function animate() {
+				requestAnimationFrame( animate );
+				
+				
+				render();
+				
+			}
+			t_homepc_hpc = true;
+			function render(){
+			
+				homepc_hpc(t_homepc_hpc, 50, 0);
+				hpc_iPlant(t_hpc_iplant, 50, total);
+				homepc_lima(t_homepc_lima, 50, 1);
+				homepc_delta(t_homepc_delta, 50, 1);
+				lima_hpc(t_lima_hpc, 50, 1);
+				delta_hpc(t_delta_hpc, 50, 1);
+				lima_iplant(t_lima_iplant,50,1);
+				delta_iplant(t_delta_iplant,50,1);
+				hpc_lima(t_hpc_lima,50,1,total);
+				hpc_delta(t_hpc_delta,50,1,total);
+				iplant_delta(t_iplant_delta,300,1);
+				iplant_lima(t_iplant_lima,100,1);
+				lima_iplant_data(t_lima_iplant_data,300,1);
+				delta_iplant_data(t_delta_iplant_data,500,1);
+				camera.position.x = mouseX;
+				camera.position.y = mouseY;
+				
+				
+				renderer.render(scene,camera);
+			}
+			
+			
+			//functions for data transfers
+			//
+			//
+			//
+			//
+			
+			//distance between nodes
+			// home pc to delta
+			var distx_homepc_delta = delta.position.x - homepc.position.x;
+			var disty_homepc_delta = delta.position.y - homepc.position.y;
+			//home pc to lima
+			var distx_homepc_lima = lima.position.x - homepc.position.x;
+			var disty_homepc_lima = lima.position.y - homepc.position.y;
+			//home pc to hpc
+			var distx_homepc_hpc = hpc.position.x - homepc.position.x;
+			var disty_homepc_hpc = hpc.position.y - homepc.position.y;
+			// lima to hpc
+			var distx_lima_hpc = hpc.position.x - lima.position.x;
+			var disty_lima_hpc = hpc.position.y - lima.position.y;
+			//hpc to iplant
+			var distx_hpc_iplant = iPlant.position.x - hpc.position.x;
+			var disty_hpc_iplant = iPlant.position.y - hpc.position.y;
+			//lima to iplant
+			var distx_lima_iplant = iPlant.position.x - lima.position.x;
+			var disty_lima_iplant = iPlant.position.y - lima.position.y;
+			// delta to iplant
+			var distx_delta_iplant = iPlant.position.x - delta.position.x;
+			var disty_delta_iplant = iPlant.position.y - delta.position.y;
+			// hpc to delta
+			var distx_delta_hpc = hpc.position.x - delta.position.x;
+			var disty_delta_hpc = hpc.position.y - delta.position.y;
+			
+			//transfer from home pc to hpc
+			var count_homepc_hpc = 0;
+			function homepc_hpc(active, size, num){
+				if(active == true){
+					if(count_homepc_hpc <= num){
+						light1.position.x += distx_homepc_hpc/size;
+						light1.position.y += disty_homepc_hpc/size; 
+						if(light1.position.x <= hpc.position.x){
+							count_homepc_hpc +=1;
+							light1.position.x = homepc.position.x;
+						}
+					}
+					else {
+						active = false;
+						t_homepc_hpc = false;
+						if (count_homepc_hpc >= num){
+							t_hpc_iplant = true;
+						}
+					}
+				}
+			}
+			
+			
+			//transfer from hpc to iplant
+			var count_hpc_iplant = 0;
+			var total_count = 0;
+			function hpc_iPlant(active, size, num){
+				if(active == true){
+					if(count_hpc_iplant < num){
+						light2.position.x += distx_hpc_iplant/size * Math.random();
+						light2.position.y += disty_hpc_iplant/size * Math.random();
+						if (light2.position.x <= iPlant.position.x){
+							count_hpc_iplant +=1;
+							light2.position.x = hpc.position.x;
+						}
+					}
+					else {
+						active = false;
+						t_hpc_iplant = false;
+						if (count_hpc_iplant >= num){
+							t_homepc_lima = true;
+							t_homepc_delta = true;
+						}
+				
+					}
+				}
+
+			}
+			 //transfer from home pc to lima.futurgrid
+			var count_homepc_lima = 0;
+			function homepc_lima(active, size, num){
+				if (active == true){
+					if ( count_homepc_lima < num){
+						light3.position.x += distx_homepc_lima/size * Math.random();
+						light3.position.y += disty_homepc_lima/size * Math.random();
+						if (light3.position.x <= lima.position.x){
+							count_homepc_lima +=1;
+							light3.position.x = homepc.position.x;
+							light3.position.y = homepc.position.y;
+						}
+					}
+					else {
+						active = false;
+						t_homepc_lima = false;
+						if( count_homepc_lima >= num){
+							t_lima_hpc = true;
+						}
+					}
+				}
+			}
+			
+			//transfer from home pc to delta
+			var count_homepc_delta = 0;
+			function homepc_delta(active,size,num){
+				if(active == true){
+					if ( count_homepc_delta < num) {
+						light4.position.x += distx_homepc_delta/size * Math.random();
+						light4.position.y += disty_homepc_delta/size * Math.random();
+						if  (light4.position.x <= delta.position.x){
+							count_homepc_delta +=1;
+							light4.position.x = homepc.position.x;
+							light4.position.y = homepc.position.y;
+						}
+					}
+					else {
+						active = false;
+						t_homepc_delta = false;
+						if (count_homepc_delta >= num){
+							t_delta_hpc = true;
+						}
+					}
+				}
+			}
+			
+			//transfer from lima to hpc
+			var count_lima_hpc = 0;
+			function lima_hpc(active,size,num){
+				if(active == true){
+					if (count_lima_hpc < num) {
+						light5.position.y += disty_lima_hpc/size * Math.random();
+						light5.position.x += distx_lima_hpc/size * Math.random();
+						if (light5.position.y <= hpc.position.y){
+							count_lima_hpc += 1;
+							light5.position.y = lima.position.y;
+							light5.position.x = lima.position.x;
+						}
+					}
+					else {
+						active = false;
+						t_lima_hpc = false;
+						if(count_lima_hpc >= num){
+							t_hpc_lima = true;
+							count_hpc_lima = 0;
+							total_count +=1;
+						}
+					}
+				}
+			}
+			
+			//command sent from delta to hpc
+			var count_delta_hpc = 0;
+			function delta_hpc(active,size,num){
+				if(active == true){
+					if (count_delta_hpc < num) {
+						light6.position.y += disty_delta_hpc/size * Math.random();
+						light6.position.x += distx_delta_hpc/size * Math.random();
+						if (light6.position.y >= hpc.position.y){
+							count_delta_hpc += 1;
+							light6.position.y = delta.position.y;
+							light6.position.x = delta.position.x;
+						}
+					}
+					else {
+						active = false;
+						t_delta_hpc = false;
+						if(count_delta_hpc >= num){
+							t_hpc_delta = true;
+							count_delta_iplant_data = 0;
+							count_hpc_delta = 0;
+							total_count += 1;
+						}
+					}
+				}
+			}
+			
+			//send command from lima to iPlant
+			var count_lima_iplant = 0;
+			function lima_iplant(active,size,num){
+				if(active == true){
+					if(count_lima_iplant < num && active == true){
+						light7.position.x += distx_lima_iplant/size * Math.random();
+						light7.position.y += disty_lima_iplant/size * Math.random();
+						if (light7.position.x <= iPlant.position.x){
+							count_lima_iplant += 1;
+							light7.position.x = lima.position.x;
+							light7.position.y = lima.position.y;
+						}
+					}
+					else {
+						active = false;
+						t_lima_iplant = false;
+						if(count_lima_iplant >= num){
+							t_iplant_lima =true;
+							count_iplant_lima = 0;
+						}
+					}
+				}
+			}
+			
+			//send command from delta to iPlant
+			var count_delta_iplant = 0;
+			function delta_iplant(active,size,num){
+				if(active == true){
+					if(count_delta_iplant < num && active == true) {
+						light8.position.x += distx_delta_iplant/size * Math.random();
+						light8.position.y += disty_delta_iplant/size * Math.random();
+						if (light8.position.x <= iPlant.position.x){
+							count_delta_iplant += 1;
+							light8.position.x = delta.position.x;
+							light8.position.y = delta.position.y;
+						}
+					}
+					else {
+						active = false;
+						t_delta_iplant = false;
+						if(count_delta_iplant >= num){
+							t_iplant_delta = true;
+							count_iplant_delta = 0;
+						}
+					}
+				}
+			}
+			
+			//hpc to lima
+			var count_hpc_lima = 0;
+			function hpc_lima(active,size,num, total1){
+				if(total_count <= total1){
+					if(active == true){
+						if(count_hpc_lima < num) {
+							light9.position.x -= distx_lima_hpc/size * Math.random();
+							light9.position.y -= disty_lima_hpc/size * Math.random();
+							if(light9.position.x >= lima.position.x){
+								count_hpc_lima += 1;
+								light9.position.x = hpc.position.x;
+								light9.position.y = hpc.position.y;
+							}
+						}
+						else {
+							active = false;
+							t_hpc_lima = false;
+							if(count_hpc_lima >= num){
+								t_lima_iplant = true;
+								count_lima_iplant = 0;
+							}
+						}
+					}
+				}
+				else {
+					active = false; 
+					t_hpc_lima = false;
+				}
+			}
+			
+			
+			var count_hpc_delta = 0;
+			function hpc_delta(active,size,num,total1){
+				if(total_count <= total1){
+					if (active == true){
+						if(count_hpc_delta < num) {
+							light10.position.x -= distx_delta_hpc/size * Math.random();
+							light10.position.y -= disty_delta_hpc/size * Math.random();
+							if(light10.position.x >= delta.position.x){
+								count_hpc_delta += 1;
+								light10.position.x = hpc.position.x;
+								light10.position.y = hpc.position.y;
+							}
+						}
+						else {
+							active = false;
+							t_hpc_delta = false;
+							if(count_hpc_delta >= num){
+								t_delta_iplant = true;
+								count_delta_iplant = 0;
+						
+							}
+						}
+					}
+				}
+				else{
+					active = 0;
+					t_hpc_delta = false;
+				}
+			}
+			
+			var count_iplant_delta = 0;
+			function iplant_delta(active,size,num){
+				if(active == true){
+					if (count_iplant_delta < num){
+						light11.position.x -= distx_delta_iplant/size * Math.random();
+						light11.position.y -= disty_delta_iplant/size * Math.random();
+						if(light11.position.x >= delta.position.x){
+							count_iplant_delta +=1;
+							light11.position.x = iPlant.position.x;
+							light11.position.y = iPlant.position.y;
+						
+						}
+					}
+					else {
+						active = false;
+						t_iplant_delta = false;
+						if(count_iplant_delta >= num){
+							t_delta_iplant_data = true;
+							count_delta_iplant_data = 0;
+						}
+					}
+				}
+			}
+			
+			var count_iplant_lima = 0;
+			function iplant_lima(active,size,num){
+				if(active == true){
+					if (count_iplant_lima < num){
+						light12.position.x -= distx_lima_iplant/size * Math.random();
+						light12.position.y -= disty_lima_iplant/size * Math.random();
+						if(light12.position.x >= lima.position.x){
+							count_iplant_lima +=1;
+							light12.position.x = iPlant.position.x;
+							light12.position.y = iPlant.position.y;
+						
+						}
+					}
+					else {
+						active = false;
+						t_iplant_lima = false;
+						if(count_iplant_lima >= num){
+							t_lima_iplant_data = true;
+							count_lima_iplant_data = 0;
+						}
+					}
+				}
+			}
+		
+			var count_lima_iplant_data = 0;
+			function lima_iplant_data(active,size, num){
+				if(active == true){
+					if(count_lima_iplant_data < num){
+						light13.position.x += distx_lima_iplant/size * Math.random();
+						light13.position.y += disty_lima_iplant/size * Math.random();
+						if(light13.position.x <= iPlant.position.x){
+							count_lima_iplant_data += 1;
+							light13.position.x = lima.position.x;
+							light13.position.y = lima.position.y;
+						}
+					}
+					else {
+						active = false;
+						t_lima_iplant_data = false;
+						if (count_lima_iplant_data >= num){
+							t_lima_hpc = true;
+							count_lima_hpc = 0;
+						}
+					}
+				}
+			}
+			
+			
+			var count_delta_iplant_data = 0;
+			function delta_iplant_data(active,size, num){
+				if(active == true){
+					if(count_delta_iplant_data < num){
+						light14.position.x += distx_delta_iplant/size * Math.random();
+						light14.position.y += disty_delta_iplant/size * Math.random();
+						if(light14.position.x <= iPlant.position.x){
+							count_delta_iplant_data += 1;
+							light14.position.x = delta.position.x;
+							light14.position.y = delta.position.y;
+						}
+					}
+					else {
+						active = false;
+						t_delta_iplant_data = false;
+						if (count_delta_iplant_data >= num){
+							t_delta_hpc = true;
+							count_delta_hpc = 0;
+						}
+					}
+				}
+			}
+			
+			function onDocumentMouseMove( event ) {
+			
+				mouseX = (event.clientX - windowHalfX )/2;
+				mouseY = (event.clientY - windowHalfY )/2;
+				
+			}
+		</script>
+		
+		
+	</body>
+</html>
